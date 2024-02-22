@@ -1,0 +1,100 @@
+//childComponent.html
+
+<template>
+    <div style="color: #4caf50;">
+    
+    <lightning-card>
+        <div style="margin-left:10px">
+        <h1>This is the Child Component</h1>
+        <h1></h1>
+        <button class="slds-button slds-button_brand" onclick={handleClick} style="background-color:sky blue; color: white;">Click ME!</button>
+        <p>{message}</p>
+    </div>
+    </lightning-card>
+</div>
+</template>
+
+//childComponent.js
+
+import { LightningElement, track } from 'lwc';
+
+
+export default class childComponent extends LightningElement {
+    @track message = 'This is from Child';
+
+
+    handleClick(){
+        const selectEvent = new CustomEvent("buttonclick",
+        {
+            bubbles : true,
+            composed : true,
+            detail : this.message,
+        });
+        
+        
+        console.log('Child Component: Dispatching Event with message:', this.message);
+
+        this.dispatchEvent(selectEvent);
+    }
+}
+
+//parentComponent.html
+
+<template>
+    <div style="color: black;">
+    <lightning-card>
+        <h1 style="margin-left:10px">This is the Parent Component</h1>
+        <c-child-component></c-child-component>
+    </lightning-card>
+</div>
+</template>
+
+//parentComponent.js
+
+import { LightningElement } from 'lwc';
+
+export default class ParentComponent extends LightningElement {
+    // No specific logic is required in this component as per your current structure.
+    // It's acting as a bridge between your childComponent and grandParentComponent.
+    connectedCallback() {
+        this.template.addEventListener('buttonclick', event => {
+            console.log('Parent Component: Received Event with message:', event.detail);
+        });
+    }
+}
+
+//garandParentComponent.html
+
+<template>
+    <div style="color: red;">
+    <lightning-card>
+        <h1 style="margin-left:10px">This is the Grand Parent Component</h1>
+        <p style="margin-left:10px">
+            {messageFromChild}
+        </p>
+        <c-parent-component onbuttonclick={handleButtonClick}></c-parent-component>
+    </lightning-card>
+</div>
+</template>
+
+//grandParentComponent.js
+
+import { LightningElement, track } from 'lwc';
+
+
+export default class grandParentComponent extends LightningElement {
+
+
+    @track messageFromChild;
+
+
+    handleButtonClick(event){
+
+
+        this.messageFromChild = event.detail;
+        console.log('Grand Parent Component: Received Event with message:', event.detail);
+
+
+    }
+}
+
